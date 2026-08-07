@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Settings & API | AI Career Connect{% endblock %}
+{% block page_title %}System Settings & Mistral API Key{% endblock %}
+{% block page_subtitle %}Configure your Mistral AI API key and user preferences{% endblock %}
+
+{% block content %}
+<div style="max-width: 750px; margin: 0 auto;">
+    <div class="glass-card">
+        <h3 style="font-family: var(--font-heading); font-size: 20px; margin-bottom: 8px;">🔑 Mistral AI Integration</h3>
+        <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px; line-height: 1.5;">
+            Enter your <strong>Mistral API Key</strong> below (from <a href="https://console.mistral.ai" target="_blank" style="color: var(--primary);">console.mistral.ai</a>). 
+            If left blank, AI Career Connect operates with its built-in simulated AI engine.
+        </p>
+
+        <div class="form-group">
+            <label class="form-label">Mistral API Key</label>
+            <input type="password" id="mistralApiKeyInput" class="form-control" value="{{ mistral_key }}" placeholder="e.g. mistral_live_xxxxxxxxxxxxxxxx">
+        </div>
+
+        <hr style="border: none; border-top: 1px solid var(--border-color); margin: 24px 0;">
+
+        <h3 style="font-family: var(--font-heading); font-size: 20px; margin-bottom: 16px;">👤 Candidate Profile Preferences</h3>
+
+        <div class="form-group">
+            <label class="form-label">Target Career Role</label>
+            <input type="text" id="prefTargetRole" class="form-control" value="{{ user.target_role if user else 'Senior AI Engineer' }}">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Experience Level</label>
+            <input type="text" id="prefExperience" class="form-control" value="{{ user.experience_level if user else 'Mid-Senior Level' }}">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Core Skills (Comma separated)</label>
+            <input type="text" id="prefSkills" class="form-control" value="{{ user.skills if user else 'Python, Flask, SQLite, Mistral AI, Web Speech API' }}">
+        </div>
+
+        <div id="settingsToast" style="display: none; padding: 12px; border-radius: var(--radius-md); background: rgba(16, 185, 129, 0.2); color: #10B981; margin-bottom: 16px; font-weight: 600;">
+            ✅ Settings updated successfully!
+        </div>
+
+        <button id="saveSettingsBtn" class="btn btn-primary" style="width: 100%;">
+            <i data-feather="save"></i> Save Configuration
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('saveSettingsBtn').addEventListener('click', () => {
+    const key = document.getElementById('mistralApiKeyInput').value;
+    const role = document.getElementById('prefTargetRole').value;
+    const exp = document.getElementById('prefExperience').value;
+    const skills = document.getElementById('prefSkills').value;
+
+    fetch('/api/settings/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            mistral_api_key: key,
+            target_role: role,
+            experience_level: exp,
+            skills: skills
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            const toast = document.getElementById('settingsToast');
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+    })
+    .catch(err => console.error("Save settings error:", err));
+});
+</script>
+{% endblock %}

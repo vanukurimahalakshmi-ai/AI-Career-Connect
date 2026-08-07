@@ -1,0 +1,129 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard | AI Career Connect{% endblock %}
+{% block page_title %}Dynamic Performance Dashboard{% endblock %}
+{% block page_subtitle %}Real-time breakdown of mock interview scores, resume optimization, and active career goals{% endblock %}
+
+{% block content %}
+<!-- Key Metrics Stats Grid -->
+<div class="grid-stats">
+    <div class="glass-card stat-card">
+        <div class="stat-icon" style="color: #6366F1; background: rgba(99, 102, 241, 0.15);">
+            <i data-feather="target"></i>
+        </div>
+        <div class="stat-value">{{ data.stats.readiness_index }}%</div>
+        <div class="stat-label">Skill Readiness Index</div>
+    </div>
+
+    <div class="glass-card stat-card">
+        <div class="stat-icon" style="color: #A855F7; background: rgba(168, 85, 247, 0.15);">
+            <i data-feather="mic"></i>
+        </div>
+        <div class="stat-value">{{ data.stats.avg_interview_score }}%</div>
+        <div class="stat-label">Avg Interview Score</div>
+    </div>
+
+    <div class="glass-card stat-card">
+        <div class="stat-icon" style="color: #06B6D4; background: rgba(6, 182, 212, 0.15);">
+            <i data-feather="file-text"></i>
+        </div>
+        <div class="stat-value">{{ data.stats.resume_match_score }}%</div>
+        <div class="stat-label">Resume Target Match</div>
+    </div>
+
+    <div class="glass-card stat-card">
+        <div class="stat-icon" style="color: #10B981; background: rgba(16, 185, 129, 0.15);">
+            <i data-feather="check-circle"></i>
+        </div>
+        <div class="stat-value">{{ data.stats.active_goals }}</div>
+        <div class="stat-label">Active Growth Goals</div>
+    </div>
+</div>
+
+<!-- Main Analytics & Performance Grid -->
+<div class="dashboard-main-grid">
+    <!-- Left Column: Chart & Interview History -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+        <div class="glass-card">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="font-family: var(--font-heading); font-size: 20px;">Interview Score Progression</h3>
+                <span style="color: var(--text-secondary); font-size: 13px;">Last 5 Mock Sessions</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Recent Interviews Table -->
+        <div class="glass-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+                <h3 style="font-family: var(--font-heading); font-size: 20px;">Recent AI Voice Interviews</h3>
+                <a href="{{ url_for('interview.interview_room') }}" class="btn btn-secondary" style="font-size: 13px; padding: 6px 14px;">+ New Session</a>
+            </div>
+
+            <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--border-color); color: var(--text-muted); font-size: 13px;">
+                        <th style="padding: 12px 8px;">Role</th>
+                        <th style="padding: 12px 8px;">Topic</th>
+                        <th style="padding: 12px 8px;">Score</th>
+                        <th style="padding: 12px 8px;">Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for session in data.recent_interviews %}
+                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.04); font-size: 14px;">
+                        <td style="padding: 14px 8px; font-weight: 600;">{{ session.target_role }}</td>
+                        <td style="padding: 14px 8px; color: var(--text-secondary);">{{ session.topic }}</td>
+                        <td style="padding: 14px 8px;">
+                            <span style="background: rgba(99, 102, 241, 0.2); color: #818CF8; padding: 4px 10px; border-radius: 12px; font-weight: 700;">
+                                {{ session.score }}/100
+                            </span>
+                        </td>
+                        <td style="padding: 14px 8px; color: var(--text-muted); font-size: 13px;">{{ session.created_at }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="padding: 20px; text-align: center; color: var(--text-muted);">No mock interviews recorded yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Right Column: Goal Tracker & Resume Audit Snapshot -->
+    <div style="display: flex; flex-direction: column; gap: 24px;">
+        <!-- Quick Action Box -->
+        <div class="glass-card" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);">
+            <h3 style="font-family: var(--font-heading); font-size: 20px; margin-bottom: 8px;">🎙️ AI Voice Interview Room</h3>
+            <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 20px; line-height: 1.5;">
+                Practice real-time technical questions. Speak into your mic (STT) and listen to spoken AI feedback (TTS).
+            </p>
+            <a href="{{ url_for('interview.interview_room') }}" class="btn btn-primary" style="width: 100%;">Launch Interview Studio</a>
+        </div>
+
+        <!-- Career Growth Goals -->
+        <div class="glass-card">
+            <h3 style="font-family: var(--font-heading); font-size: 20px; margin-bottom: 16px;">Active Milestones</h3>
+            <div style="display: flex; flex-direction: column; gap: 16px;">
+                {% for goal in data.goals %}
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); padding: 14px; border-radius: var(--radius-md);">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                        <span style="font-weight: 600; font-size: 14px;">{{ goal.goal_title }}</span>
+                        <span style="color: var(--accent-cyan); font-weight: 700; font-size: 13px;">{{ goal.progress_percentage }}%</span>
+                    </div>
+                    <div style="width: 100%; height: 6px; background: rgba(255, 255, 255, 0.1); border-radius: 3px; overflow: hidden;">
+                        <div style="width: {{ goal.progress_percentage }}%; height: 100%; background: var(--primary-gradient);"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

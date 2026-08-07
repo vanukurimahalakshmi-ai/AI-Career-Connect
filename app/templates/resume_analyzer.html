@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+{% block title %}Resume Auditor | AI Career Connect{% endblock %}
+{% block page_title %}AI Resume & Skill Gap Auditor{% endblock %}
+{% block page_subtitle %}Audit your resume text against target job descriptions using Mistral AI{% endblock %}
+
+{% block content %}
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px;">
+    <!-- Left Box: Resume Input Form -->
+    <div class="glass-card">
+        <h3 style="font-family: var(--font-heading); font-size: 20px; margin-bottom: 16px;">Paste Resume & Target Role</h3>
+        
+        <div class="form-group">
+            <label class="form-label">Target Engineering Role</label>
+            <input type="text" id="resumeTargetRole" class="form-control" value="Senior AI Engineer" placeholder="e.g. Senior AI Engineer">
+        </div>
+
+        <div class="form-group">
+            <label class="form-label">Resume Content / Plain Text</label>
+            <textarea id="resumeInputText" class="form-control" placeholder="Paste your resume text here (experience, technical skills, projects)..." style="min-height: 250px;">
+Senior Software Engineer with 4+ years of experience building high-scale Python web backend microservices with Flask, SQLite, and PostgreSQL. Experienced in integrating REST APIs, background task queues, and deploying web applications. Proficient in JavaScript, Docker, and Git. Looking to advance into AI engineering and voice LLM application design.
+            </textarea>
+        </div>
+
+        <button id="runAuditBtn" class="btn btn-primary" style="width: 100%;">
+            <i data-feather="search"></i> Audit Resume with Mistral AI
+        </button>
+    </div>
+
+    <!-- Right Box: Analysis Output -->
+    <div class="glass-card" id="auditOutputCard">
+        <h3 style="font-family: var(--font-heading); font-size: 20px; margin-bottom: 16px;">AI Audit Breakdown</h3>
+        
+        <div id="auditResultsContent">
+            <div style="text-align: center; padding: 40px 20px; color: var(--text-muted);">
+                <i data-feather="file-text" style="width: 48px; height: 48px; margin-bottom: 12px; opacity: 0.4;"></i>
+                <p>Click "Audit Resume" to generate match score, identified strengths, missing keywords, and actionable tips.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('runAuditBtn').addEventListener('click', () => {
+    const role = document.getElementById('resumeTargetRole').value;
+    const text = document.getElementById('resumeInputText').value;
+
+    if (!text || text.trim().length < 20) {
+        alert("Please paste at least 20 characters of resume text.");
+        return;
+    }
+
+    const outputBox = document.getElementById('auditResultsContent');
+    outputBox.innerHTML = `
+        <div style="text-align: center; padding: 40px 20px;">
+            <div class="badge-ai"><span class="badge-dot"></span> Analyzing resume keywords against ${role}...</div>
+        </div>
+    `;
+
+    fetch('/api/resume/analyze', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ target_role: role, resume_text: text })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status === 'success') {
+            const res = data.result;
+            outputBox.innerHTML = `
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; padding: 16px; background: rgba(99, 102, 241, 0.1); border-radius: var(--radius-md);">
+                    <div>
+                        <h4 style="font-size: 16px; color: var(--text-secondary);">Job Match Index</h4>
+                        <span style="font-size: 32px; font-weight: 800; color: #10B981;">${res.match_score}% Match</span>
+                    </div>
+                    <span class="badge-ai">Verified by AI</span>
+                </div>
+
+                <div style="margin-bottom: 18px;">
+                    <h5 style="color: var(--accent-emerald); font-size: 15px; margin-bottom: 8px;">✅ Identified Key Strengths</h5>
+                    <ul style="padding-left: 20px; color: #CBD5E1; font-size: 14px;">
+                        ${(res.strengths || []).map(s => `<li style="margin-bottom: 6px;">${s}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div style="margin-bottom: 18px;">
+                    <h5 style="color: var(--accent-amber); font-size: 15px; margin-bottom: 8px;">⚠️ Recommended Skill Additions</h5>
+                    <ul style="padding-left: 20px; color: #CBD5E1; font-size: 14px;">
+                        ${(res.missing_skills || []).map(m => `<li style="margin-bottom: 6px;">${m}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div>
+                    <h5 style="color: #818CF8; font-size: 15px; margin-bottom: 8px;">💡 Actionable Resume Enhancements</h5>
+                    <ul style="padding-left: 20px; color: #CBD5E1; font-size: 14px;">
+                        ${(res.recommendations || []).map(r => `<li style="margin-bottom: 6px;">${r}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+        }
+    })
+    .catch(err => {
+        console.error("Resume audit error:", err);
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI Career Connect{% endblock %}</title>
+    
+    <!-- Custom Design System CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    
+    <!-- Chart.js for Dynamic Dashboard Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Feather Icons -->
+    <script src="https://unpkg.com/feather-icons"></script>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-logo">AI</div>
+                <div class="brand-name">CareerConnect</div>
+            </div>
+
+            <ul class="nav-menu">
+                <li class="nav-item {% if request.path == '/' or request.path == '/dashboard' %}active{% endif %}">
+                    <a href="{{ url_for('dashboard.index') }}">
+                        <i data-feather="grid" class="nav-icon"></i>
+                        <span class="nav-text">Dashboard</span>
+                    </a>
+                </li>
+                <li class="nav-item {% if '/interview' in request.path %}active{% endif %}">
+                    <a href="{{ url_for('interview.interview_room') }}">
+                        <i data-feather="mic" class="nav-icon"></i>
+                        <span class="nav-text">Voice Interview</span>
+                    </a>
+                </li>
+                <li class="nav-item {% if '/resume-analyzer' in request.path %}active{% endif %}">
+                    <a href="{{ url_for('ai_coach.resume_page') }}">
+                        <i data-feather="file-text" class="nav-icon"></i>
+                        <span class="nav-text">Resume Auditor</span>
+                    </a>
+                </li>
+                <li class="nav-item {% if '/career-roadmap' in request.path %}active{% endif %}">
+                    <a href="{{ url_for('ai_coach.roadmap_page') }}">
+                        <i data-feather="map" class="nav-icon"></i>
+                        <span class="nav-text">Career Roadmap</span>
+                    </a>
+                </li>
+                <li class="nav-item {% if '/settings' in request.path %}active{% endif %}">
+                    <a href="{{ url_for('auth.settings') }}">
+                        <i data-feather="settings" class="nav-icon"></i>
+                        <span class="nav-text">Settings & API</span>
+                    </a>
+                </li>
+            </ul>
+
+            <div class="sidebar-footer">
+                <div class="user-avatar">
+                    {{ data.user.username[0] if data and data.user else 'A' }}
+                </div>
+                <div class="user-info">
+                    <span class="user-name">{{ data.user.username if data and data.user else 'Alex Rivera' }}</span>
+                    <span class="user-role">{{ data.user.target_role if data and data.user else 'AI Software Engineer' }}</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace View -->
+        <main class="main-content">
+            <!-- Header Bar -->
+            <header class="top-header">
+                <div>
+                    <h1 class="page-title">{% block page_title %}Dynamic Career Dashboard{% endblock %}</h1>
+                    <p class="page-subtitle">{% block page_subtitle %}Elevate your engineering career with AI mock interviews & real-time analytics{% endblock %}</p>
+                </div>
+                <div>
+                    <span class="badge-ai">
+                        <span class="badge-dot"></span> Mistral AI Engine Active
+                    </span>
+                </div>
+            </header>
+
+            <!-- Page Content -->
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+
+    <!-- Voice Speech Engine JS -->
+    <script src="{{ url_for('static', filename='js/voice.js') }}"></script>
+    
+    <script>
+        feather.replace();
+    </script>
+    
+    {% block scripts %}{% endblock %}
+</body>
+</html>

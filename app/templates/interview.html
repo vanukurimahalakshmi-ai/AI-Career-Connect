@@ -1,0 +1,106 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Voice Interview Studio | AI Career Connect{% endblock %}
+{% block page_title %}AI Voice Mock Interview Studio{% endblock %}
+{% block page_subtitle %}Interactive voice practice: Speak your answers with STT and receive spoken feedback with TTS{% endblock %}
+
+{% block content %}
+<!-- Session Setup Container -->
+<div id="sessionSetupBox" class="glass-card" style="max-width: 700px; margin: 0 auto 32px;">
+    <h3 style="font-family: var(--font-heading); font-size: 22px; margin-bottom: 8px;">Configure Interview Session</h3>
+    <p style="color: var(--text-secondary); font-size: 14px; margin-bottom: 24px;">Select your target engineering role and topic to generate AI-powered technical questions.</p>
+
+    <div class="form-group">
+        <label class="form-label">Target Role</label>
+        <select id="targetRoleSelect" class="form-control">
+            <option value="Senior AI Engineer" selected>Senior AI Engineer</option>
+            <option value="Fullstack Flask/Python Developer">Fullstack Flask/Python Developer</option>
+            <option value="System Architect">System Architect</option>
+            <option value="Backend Developer">Backend Developer</option>
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label class="form-label">Interview Topic</label>
+        <select id="topicSelect" class="form-control">
+            <option value="Technical Behavioral & Architecture" selected>Technical Behavioral & Architecture</option>
+            <option value="System Design & Scalability">System Design & Scalability</option>
+            <option value="AI & Machine Learning">AI & Machine Learning</option>
+            <option value="Coding & Algorithms">Coding & Algorithms</option>
+        </select>
+    </div>
+
+    <button id="startSessionBtn" class="btn btn-primary" style="width: 100%; margin-top: 12px; font-size: 16px;">
+        <i data-feather="play-circle"></i> Start AI Voice Interview
+    </button>
+</div>
+
+<!-- Active Interview Studio (Hidden until started) -->
+<div id="activeInterviewStudio" style="display: none;">
+    <div class="interview-studio">
+        <!-- Left Panel: AI Interviewer Avatar & Question -->
+        <div class="glass-card interviewer-box">
+            <div id="aiAvatarBox" class="ai-avatar">
+                🤖
+            </div>
+            <h4 style="font-family: var(--font-heading); font-size: 18px; color: var(--accent-cyan); margin-bottom: 12px;">AI Technical Interviewer</h4>
+            
+            <!-- Question Box -->
+            <div style="background: rgba(15, 23, 42, 0.7); border: 1px solid var(--border-color); padding: 20px; border-radius: var(--radius-md); text-align: left; width: 100%; margin-bottom: 16px;">
+                <p id="aiQuestionText" style="font-size: 16px; line-height: 1.6; color: #F1F5F9; font-weight: 500;">
+                    Loading question...
+                </p>
+            </div>
+
+            <!-- Hints -->
+            <div id="questionHints" style="display: flex; flex-wrap: wrap; gap: 6px; width: 100%; text-align: left;">
+            </div>
+        </div>
+
+        <!-- Right Panel: Candidate Speech to Text (STT) Recorder -->
+        <div class="glass-card" style="display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <h4 style="font-family: var(--font-heading); font-size: 18px;">Candidate Voice Studio</h4>
+                <span class="badge-ai" style="font-size: 12px;">🎙️ STT & TTS Active</span>
+            </div>
+
+            <!-- Speech Recording Controls -->
+            <div style="text-align: center; margin-bottom: 16px;">
+                <button id="micRecordBtn" class="mic-button" title="Click to Record Voice Answer">
+                    <i data-feather="mic"></i>
+                </button>
+                <div id="voiceWaveAnim" class="voice-wave">
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                    <div class="wave-bar"></div>
+                </div>
+                <p id="speechStatusText" style="color: var(--text-secondary); font-size: 13px; margin-top: 8px;">
+                    Click microphone to start Speech-to-Text (STT) recording
+                </p>
+            </div>
+
+            <!-- Speech Transcript Box -->
+            <div class="form-group" style="flex: 1;">
+                <label class="form-label">Live Speech-to-Text Transcript</label>
+                <textarea id="userSpeechInput" class="form-control" placeholder="Your spoken audio will transcribe here automatically. You can also edit text before submitting..." style="min-height: 140px;"></textarea>
+            </div>
+
+            <button id="submitAnswerBtn" class="btn btn-primary" style="width: 100%; margin-top: 8px;">
+                <i data-feather="send"></i> Submit Answer for AI Feedback
+            </button>
+        </div>
+    </div>
+
+    <!-- AI Feedback Output Box -->
+    <div id="aiFeedbackBox" class="glass-card" style="margin-top: 24px; display: none;">
+        <h3 style="font-family: var(--font-heading); font-size: 20px; margin-bottom: 16px;">AI Interviewer Feedback & Evaluation</h3>
+        <div id="feedbackContent"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/interview.js') }}"></script>
+{% endblock %}
