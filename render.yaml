@@ -3,7 +3,7 @@ services:
     name: ai-career-connect
     runtime: python
     buildCommand: pip install -r requirements.txt
-    startCommand: gunicorn run:app
+    startCommand: gunicorn app:app
     envVars:
       - key: SECRET_KEY
         generateValue: true

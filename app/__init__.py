@@ -35,3 +35,4 @@ def create_app(config_class=Config):
         DatabaseService.seed_initial_data_if_empty()
 
     return app
+
