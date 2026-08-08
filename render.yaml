@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: ai-career-connect
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn run:app
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true
+      - key: MISTRAL_API_KEY
+        sync: false
